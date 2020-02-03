@@ -2,12 +2,19 @@
 @inject LuckySpin.Models.TextTransformService Transform
 @{
     Layout = "_Layout";
+    // TODO: Submit your answer in Canvas
+    //   Why do we use this CultureInfo object? (HINT: try removing it)
     var culture = new System.Globalization.CultureInfo("en-US");
+    // TODO: Submit your answer in Canvas
+    //   What does the following line of code do for this View?
     var display = Model.Winner ? "block" : "none";
 }
 <button onclick='history.go(0)'>Spin</button>
+
 <div>@Model.A</div><div>@Model.B</div><div>@Model.C</div>
+
 <h2>Current Balance: @Model.Balance.ToString("C", culture)</h2>
+
 <span style="display:@display">
     <h2>Congratulations @Model.FirstName,<br/>You Win with a Lucky @Model.Luck!</h2>
     <img src="/Images/LuckySpinCoins.jpg" class="animated bounce" alt="Coins"/>

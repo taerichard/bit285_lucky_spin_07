@@ -1,13 +1,10 @@
 ﻿@model IEnumerable<LuckySpin.Models.Spin>
-@inject LuckySpin.Models.Repository repo
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     Layout = "_Layout";
     int num = 0;
-    var culture = new System.Globalization.CultureInfo("en-US");
 }
 <h1>Out of Luck</h1>
-<h2>Final Balance: @repo.CurrentPlayer.Balance.ToString("C",culture)</h2>
 <table>
     <thead><tr><th>Spin #</th><th>Result</th></tr></thead>
     <tbody>

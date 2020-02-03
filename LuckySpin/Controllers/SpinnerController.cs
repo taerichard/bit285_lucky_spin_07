@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using LuckySpin.Models;
 using LuckySpin.ViewModels;
@@ -10,6 +7,8 @@ namespace LuckySpin.Controllers
 {
     public class SpinnerController : Controller
     {
+        //TODO: remove reference to the Singleton Repository
+        //      and inject a reference (dbcRepo) to the LuckySpinContext 
         private Repository repository;
         Random random = new Random();
 
@@ -36,41 +35,48 @@ namespace LuckySpin.Controllers
         {
             if (!ModelState.IsValid) { return View(); }
 
-            //Set up Repository
-            repository.CurrentPlayer = new Player
+            //Create a new Player object
+            Player player = new Player
             {
                 FirstName = info.FirstName,
                 Luck = info.Luck,
                 Balance = info.StartingBalance
             };
-            repository.ClearSpins();
-           
+            //TODO: Update persistent data using dbcRepo.Players.Add() and SaveChanges()
+            repository.CurrentPlayer = player;
+
+            //TODO: Pass the player Id to SpinIt
             return RedirectToAction("SpinIt");
         }
 
         /***
-         * Game play through one Spin
+         * Play through one Spin
          **/  
          [HttpGet]      
-         public IActionResult SpinIt()
+         public IActionResult SpinIt() //TODO: receive the player Id
         {
-            // Call constructor to create a new SpinItViewModel for this spin
-            // Use the player information in the repository
+            //TODO: Use the dbcRepo.Player.Find() to get the player object
+
+            // QUESTION 1: Why use the repository player information to initialize the SpinItViewModel?
+            //            (HINT: See what happens if you don't initialize it.)
+            //TODO: Intialize the spinItVM with the player object from the database
             SpinItViewModel spinItVM = new SpinItViewModel() {
                 FirstName = repository.CurrentPlayer.FirstName,
                 Luck = repository.CurrentPlayer.Luck,
                 Balance = repository.CurrentPlayer.Balance
             };
 
-            //Check if enough balance to play, if not drop out to LuckList
+            // QUESTION 2: What else does ChargeSpin() do besides check if there is enough $$ to spin?
             if (!spinItVM.ChargeSpin())
             {
                 return RedirectToAction("LuckList");
             }
-            // Check for Winnings
+            // QUESTION 3: Locate the if-else logic to determine a winning spin?
+            //             Why do you think it is done there? 
             if (spinItVM.Winner) { spinItVM.CollectWinnings(); }
 
-            //Update Player Balance
+            // QUESTION 4: Why is it necessary to update the player's balance from the spinItVM after a spin?
+            // TODO: Update the player Balance using the Player from the database
             repository.CurrentPlayer.Balance = spinItVM.Balance;
 
             //Store the Spin in the Repository
@@ -78,6 +84,7 @@ namespace LuckySpin.Controllers
             {
                 IsWinning = spinItVM.Winner
             };
+            //TODO: Update persistent data using dbcRepo.Spins.Add() and SaveChanges()
             repository.AddSpin(spin);
 
             return View("SpinIt", spinItVM);
@@ -89,6 +96,7 @@ namespace LuckySpin.Controllers
          [HttpGet]
          public IActionResult LuckList()
         {
+            //TODO: Pass the View the Spins collection from the dbcRepo
             return View(repository.PlayerSpins);
         }
 
